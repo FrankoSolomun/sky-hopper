@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 // Define the type of power-up this pickup represents
-public enum PowerUpType { Magnet, Shield }
+public enum PowerUpType { Magnet, Shield, Jetpack }
 
 public class PowerUpPickup : MonoBehaviour
 {
@@ -10,11 +10,12 @@ public class PowerUpPickup : MonoBehaviour
     public float powerUpDuration = 10f;
     public Vector3 playerHeadOffset = new Vector3(-0.5f, 0f, 0f);
 
-    // Select the type of power-up in the Inspector (Magnet or Shield)
+    // Select the type of power-up in the Inspector (Magnet, Shield, or Jetpack)
     public PowerUpType powerUpType;
 
     public MagnetPowerUp magnetScript;
     public ShieldPowerUp shieldScript;
+    // (No pre-assignment for Jetpack is needed since we'll auto-assign it from the player)
 
     private bool isPickedUp = false;
 
@@ -69,6 +70,21 @@ public class PowerUpPickup : MonoBehaviour
                     Debug.LogError("No shield script assigned!");
                 }
             }
+            else if (powerUpType == PowerUpType.Jetpack)
+            {
+                // For Jetpack, we auto-assign the JetpackPowerUp component from the player.
+                JetpackPowerUp jetpackScript = other.GetComponent<JetpackPowerUp>();
+                Debug.Log("Auto-assigned jetpackScript: " + (jetpackScript != null));
+                if (jetpackScript != null)
+                {
+                    Debug.Log("Activating jetpack...");
+                    jetpackScript.ActivateJetpack();
+                }
+                else
+                {
+                    Debug.LogError("No jetpack script assigned on player!");
+                }
+            }
 
             StartCoroutine(PowerUpActiveRoutine());
         }
@@ -90,6 +106,15 @@ public class PowerUpPickup : MonoBehaviour
             if (shieldScript != null)
             {
                 shieldScript.DisableShield();
+            }
+        }
+        else if (powerUpType == PowerUpType.Jetpack)
+        {
+            // For Jetpack, disable it when the duration expires.
+            JetpackPowerUp jetpackScript = GetComponentInParent<JetpackPowerUp>();
+            if (jetpackScript != null)
+            {
+                jetpackScript.DisableJetpack();
             }
         }
 
