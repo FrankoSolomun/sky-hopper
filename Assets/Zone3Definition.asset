@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0e0d54912fc44359abf81f316bb9663, type: 3}
+  m_Name: Zone3Definition
+  m_EditorClassIdentifier: 
+  zoneName: SpaceZone
+  zoneBackgrounds:
+  - {fileID: 565662350349544254, guid: 173b61802c1384a0c9ba91be1ad0b538, type: 3}
+  - {fileID: 1871276956519544375, guid: 47f21df93c032446d8203040f6632e72, type: 3}
+  - {fileID: 1871276956519544375, guid: 47f21df93c032446d8203040f6632e72, type: 3}
+  zonePlatformPrefabs:
+  - {fileID: 5697460094655888428, guid: 9ba67c983079a48fb9afdfca9f8266d3, type: 3}
+  - {fileID: 9066828592018470776, guid: 1093180dd42a84ba397e3de3afd0f217, type: 3}
+  - {fileID: 1468839783492944388, guid: 3c45b38c0849c4e5f90724acbbe1d99c, type: 3}
+  - {fileID: 8001851268968008618, guid: 8fb482a482bbe43dabda097d25e8d563, type: 3}
+  - {fileID: 6168173675608536052, guid: 28c41062845f14059ac633fc9adbaaf4, type: 3}
+  - {fileID: 6370180878791867728, guid: e68d0f57d46404036964ed604b67a2c2, type: 3}
+  - {fileID: 7613403091454568886, guid: ef13bf940dff347e687fac6efb4f6664, type: 3}
+  - {fileID: 3755208740335926364, guid: c23e4cac2ae6845d2b35ea67c6d8ef61, type: 3}
+  - {fileID: 739787212369552082, guid: 9ee259047fb314380b7c381cb6337d9c, type: 3}
+  startScore: 40
+  endScore: 1000

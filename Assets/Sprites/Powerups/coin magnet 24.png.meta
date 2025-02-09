@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      coin magnet 24_0: -8672054552570811305
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

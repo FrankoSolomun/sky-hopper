@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      03sky transition 02 to 03_0: -386956100703080258
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

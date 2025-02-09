@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      04rain particles_0: 6875294096586043452
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0e0d54912fc44359abf81f316bb9663, type: 3}
+  m_Name: Zone2Definition
+  m_EditorClassIdentifier: 
+  zoneName: StormZone
+  zoneBackgrounds:
+  - {fileID: 6658853214937958704, guid: 374d22f4e04874fc789929a52a75fbb1, type: 3}
+  - {fileID: 5552064413787764245, guid: e0e13b11c7d7b42e689d40a8bfa068b6, type: 3}
+  - {fileID: 3981215629161561267, guid: d8e1f72be512f4a2ab6e5cb750e3da77, type: 3}
+  zonePlatformPrefabs:
+  - {fileID: 265980366229232734, guid: 1b516c44ddf3e469ba29c24953cb07ba, type: 3}
+  - {fileID: 5209493099401443692, guid: 77fda27ab35134ef3bfc901ef386542f, type: 3}
+  - {fileID: 1444310284085977568, guid: 6f26e5d0db75f487ba3c3862b8e25ab5, type: 3}
+  - {fileID: 7373070449208408507, guid: 253f6bb40116743528af7448061f2cde, type: 3}
+  - {fileID: 7033066570586770376, guid: 52d02a3ca6ef74f929b520123fc91f9d, type: 3}
+  - {fileID: 6529959244824460020, guid: 3a63fa3fc597d4a73a2458e717a2ce9e, type: 3}
+  startScore: 20
+  endScore: 40

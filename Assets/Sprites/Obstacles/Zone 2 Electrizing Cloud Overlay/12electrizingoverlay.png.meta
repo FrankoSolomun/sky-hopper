@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      12electrizingoverlay_0: -7121986594508532582
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

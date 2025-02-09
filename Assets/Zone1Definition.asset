@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0e0d54912fc44359abf81f316bb9663, type: 3}
+  m_Name: Zone1Definition
+  m_EditorClassIdentifier: 
+  zoneName: SkyZone
+  zoneBackgrounds:
+  - {fileID: 8651172751324337498, guid: c61c311c23ff64e148e38e2061000df8, type: 3}
+  - {fileID: 8143032617511230795, guid: 5b8e0fa32d54d420ba7d9efb9e942ff5, type: 3}
+  - {fileID: 2183363577991331177, guid: c3d8ccd937aa043c69a47c4912b7e0f5, type: 3}
+  zonePlatformPrefabs:
+  - {fileID: 3477750324015517409, guid: bf4c31d9b550847d8b46206e5fd45956, type: 3}
+  - {fileID: 7147052478377130057, guid: 1be549b5ed4f648ab9c075f85d7fa2f1, type: 3}
+  - {fileID: 6263913491153470687, guid: f2341b98228d8483ba527b3626c14dcf, type: 3}
+  - {fileID: 6290828929241130494, guid: 92065185b44b14e76b5e15d565efb6d9, type: 3}
+  - {fileID: 9181201635530431764, guid: 3f6f794b880c84dc5ada9e9beddc53b4, type: 3}
+  - {fileID: 1957460691531786797, guid: 9dfa49c76ac30437b986b52d01d32c07, type: 3}
+  startScore: 0
+  endScore: 20

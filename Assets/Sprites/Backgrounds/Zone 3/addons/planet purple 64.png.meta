@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      planet purple 64_0: -3850444698675287875
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
