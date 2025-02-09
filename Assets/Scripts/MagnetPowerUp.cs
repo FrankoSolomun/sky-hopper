@@ -21,7 +21,6 @@ public class MagnetPowerUp : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
         if (player == null)
         {
-            Debug.LogError("MagnetPowerUp: Player not found!");
         }
     }
 
@@ -29,24 +28,18 @@ public class MagnetPowerUp : MonoBehaviour
     {
         if (isActive)
         {
-            Debug.LogWarning("Magnet already active!");
             return;
         }
 
         isActive = true;
-        Debug.Log("Magnet Activated!");
 
         // Show icon
         if (magnetIconPrefab != null && player != null)
         {
             magnetIconInstance = Instantiate(magnetIconPrefab, player.position + iconOffset, Quaternion.identity);
             magnetIconInstance.transform.SetParent(player, true);
-            Debug.Log("Magnet icon spawned.");
         }
-        else
-        {
-            Debug.LogWarning("Magnet icon prefab or player missing!");
-        }
+
 
         StartCoroutine(DisableAfterTime(magnetDuration));
     }
@@ -60,7 +53,6 @@ public class MagnetPowerUp : MonoBehaviour
     public void DisableMagnet()
     {
         isActive = false;
-        Debug.Log("Magnet Deactivated!");
 
         if (magnetIconInstance != null)
         {
@@ -79,35 +71,29 @@ public class MagnetPowerUp : MonoBehaviour
     {
         // Use FindObjectsOfType instead of FindObjectsByType for broader Unity version support
         StarPickup[] allStars = FindObjectsOfType<StarPickup>();
-        Debug.Log($"Found {allStars.Length} stars in the scene.");
 
         foreach (StarPickup star in allStars)
         {
             if (!star)
             {
-                Debug.LogWarning("Skipping null star.");
                 continue;
             }
 
             float dist = Vector3.Distance(star.transform.position, player.position);
-            Debug.Log($"Star distance: {dist} (Range: {magnetRange})");
 
             if (dist < magnetRange)
             {
-                Debug.Log("Star in range! Pulling...");
                 star.transform.SetParent(null); // Unparent
 
                 if (star.TryGetComponent<Rigidbody2D>(out var rb))
                 {
                     Vector2 direction = (player.position - star.transform.position).normalized;
                     rb.linearVelocity = direction * pullSpeed;
-                    Debug.Log($"Star velocity set: {rb.linearVelocity}");
                 }
                 else
                 {
                     Vector3 direction = (player.position - star.transform.position).normalized;
                     star.transform.position += direction * pullSpeed * Time.deltaTime;
-                    Debug.Log($"Star position updated: {star.transform.position}");
                 }
             }
         }

@@ -24,8 +24,13 @@ public class Move : MonoBehaviour
     // NEW: Whether we should ignore the very first platform
     private bool ignoreFirstLanding = true;
 
-    private Vector3 lastPlatformPosition; // Where we last safely stood
-    private bool hasLastPlatformPosition = false;
+    // Instead of storing a fixed position, store a reference to the last platform's transform.
+    private Transform lastPlatform;
+    private bool hasLastPlatform = false;
+
+    // Adjustable offset when respawning with shield.
+    // Tweak this value in the Inspector until the player lands safely on the platform.
+    public float safeRespawnOffset = 1.2f;
 
     void Start()
     {
@@ -66,29 +71,38 @@ public class Move : MonoBehaviour
         float clampedX = Mathf.Clamp(transform.position.x, leftBoundary, rightBoundary);
         transform.position = new Vector3(clampedX, transform.position.y, transform.position.z);
 
-        // Restart game if player falls below the last platform
+        // Restart game if player falls below the safe threshold
         if (transform.position.y < PlatformSpawner.lowestPlatformY - 2f)
         {
-            // check if shield is active
+            Debug.Log("Player is falling below safe threshold. Checking for shield...");
             ShieldPowerUp shield = FindObjectOfType<ShieldPowerUp>();
-            if (shield && shield.IsShieldActive() && hasLastPlatformPosition)
+            if (shield != null)
             {
-                // teleport back to lastPlatformPosition
+                Debug.Log("Found ShieldPowerUp. IsShieldActive: " + shield.IsShieldActive() + ", hasLastPlatform: " + hasLastPlatform);
+            }
+            else
+            {
+                Debug.Log("No ShieldPowerUp found on the scene.");
+            }
+            if (shield && shield.IsShieldActive() && hasLastPlatform)
+            {
+                Debug.Log("Shield is active. Teleporting player to current position of last platform: " + lastPlatform.position);
+                // Use the current position of the platform plus an offset
                 transform.position = new Vector3(
-                    lastPlatformPosition.x,
-                    lastPlatformPosition.y + 1f,
+                    lastPlatform.position.x,
+                    lastPlatform.position.y + safeRespawnOffset,
                     transform.position.z
                 );
 
-                // reset vertical velocity
+                // Reset vertical velocity
                 rb.linearVelocity = Vector2.zero;
 
-                // disable shield so it can't be used again
+                // Disable shield so it can't be used again
                 shield.DisableShield();
             }
             else
             {
-                // normal death
+                Debug.Log("Shield not active or no last platform saved. Restarting game.");
                 RestartGame();
             }
         }
@@ -121,8 +135,10 @@ public class Move : MonoBehaviour
             {
                 if (contact.normal.y > 0.5f) // landing from above
                 {
-                    lastPlatformPosition = collision.transform.position;
-                    hasLastPlatformPosition = true;
+                    // Save a reference to the platform's transform so that we can use its current position later.
+                    lastPlatform = collision.transform;
+                    hasLastPlatform = true;
+                    Debug.Log("Landed on platform (reference saved): " + lastPlatform.name + " at position: " + lastPlatform.position);
 
                     isGrounded = true;
 
@@ -162,7 +178,7 @@ public class Move : MonoBehaviour
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        // If we leave a platform, set isGrounded=false & un-parent
+        // If we leave a platform, set isGrounded = false & un-parent if needed
         if (collision.gameObject.CompareTag("Platform") || collision.gameObject.CompareTag("SpecialPlatform"))
         {
             isGrounded = false;

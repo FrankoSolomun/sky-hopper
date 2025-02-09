@@ -139,5 +139,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   powerUpDuration: 10
   playerHeadOffset: {x: -0.5, y: 0, z: 0}
+  powerUpType: 1
   magnetScript: {fileID: 0}
   shieldScript: {fileID: 0}

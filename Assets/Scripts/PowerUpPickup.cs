@@ -1,11 +1,17 @@
 using UnityEngine;
 using System.Collections;
 
+// Define the type of power-up this pickup represents
+public enum PowerUpType { Magnet, Shield }
+
 public class PowerUpPickup : MonoBehaviour
 {
     [Header("Power-Up Settings")]
     public float powerUpDuration = 10f;
     public Vector3 playerHeadOffset = new Vector3(-0.5f, 0f, 0f);
+
+    // Select the type of power-up in the Inspector (Magnet or Shield)
+    public PowerUpType powerUpType;
 
     public MagnetPowerUp magnetScript;
     public ShieldPowerUp shieldScript;
@@ -17,7 +23,7 @@ public class PowerUpPickup : MonoBehaviour
         if (other.CompareTag("Player") && !isPickedUp)
         {
             isPickedUp = true;
-            Debug.Log("Power-Up collected!");
+            Debug.Log("Power-Up collected! Type: " + powerUpType);
 
             // Attach to player
             transform.SetParent(other.transform, true);
@@ -28,20 +34,40 @@ public class PowerUpPickup : MonoBehaviour
             var col = GetComponent<Collider2D>();
             if (col) col.enabled = false;
 
-            // Activate magnet
-            if (magnetScript != null)
+            // Activate the appropriate power-up based on the specified type
+            if (powerUpType == PowerUpType.Magnet)
             {
-                Debug.Log("Activating magnet...");
-                magnetScript.ActivateMagnet();
+                if (magnetScript == null)
+                {
+                    magnetScript = other.GetComponent<MagnetPowerUp>();
+                    Debug.Log("Auto-assigned magnetScript: " + (magnetScript != null));
+                }
+                if (magnetScript != null)
+                {
+                    Debug.Log("Activating magnet...");
+                    magnetScript.ActivateMagnet();
+                }
+                else
+                {
+                    Debug.LogError("No magnet script assigned!");
+                }
             }
-            else if (shieldScript != null)
+            else if (powerUpType == PowerUpType.Shield)
             {
-                Debug.Log("Activating shield...");
-                shieldScript.ActivateShield();
-            }
-            else
-            {
-                Debug.LogError("No power-up script assigned!");
+                if (shieldScript == null)
+                {
+                    shieldScript = other.GetComponent<ShieldPowerUp>();
+                    Debug.Log("Auto-assigned shieldScript: " + (shieldScript != null));
+                }
+                if (shieldScript != null)
+                {
+                    Debug.Log("Activating shield...");
+                    shieldScript.ActivateShield();
+                }
+                else
+                {
+                    Debug.LogError("No shield script assigned!");
+                }
             }
 
             StartCoroutine(PowerUpActiveRoutine());
@@ -52,13 +78,19 @@ public class PowerUpPickup : MonoBehaviour
     {
         yield return new WaitForSeconds(powerUpDuration);
 
-        if (magnetScript != null)
+        if (powerUpType == PowerUpType.Magnet)
         {
-            magnetScript.DisableMagnet();
+            if (magnetScript != null)
+            {
+                magnetScript.DisableMagnet();
+            }
         }
-        else if (shieldScript != null)
+        else if (powerUpType == PowerUpType.Shield)
         {
-            shieldScript.DisableShield();
+            if (shieldScript != null)
+            {
+                shieldScript.DisableShield();
+            }
         }
 
         Destroy(gameObject);
