@@ -20,8 +20,6 @@ public class StarManager : MonoBehaviour
         }
         Instance = this;
 
-        // (Optional) keep this across scene loads
-        // DontDestroyOnLoad(gameObject);
     }
 
     void Start()
@@ -43,7 +41,6 @@ public class StarManager : MonoBehaviour
         }
     }
 
-    // (Optional) Provide a way to reset stars to 0:
     public void ResetStars()
     {
         totalStars = 0;

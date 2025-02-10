@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
-using UnityEngine.SceneManagement; // Required for restarting the game
-using System.Collections.Generic; // Required for HashSet
+using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class Move : MonoBehaviour
 {
@@ -12,16 +12,16 @@ public class Move : MonoBehaviour
     private Rigidbody2D rb;
     public static bool isGrounded = false;
 
-    // The total count of unique platforms landed on
+    // The total count of unique platforms landed on (or passed)
     public static int platformsJumped = 0;
 
-    // Tracks which platforms have been counted
+    // Tracks which platforms have been counted (via collision)
     private HashSet<GameObject> jumpedPlatforms = new HashSet<GameObject>();
 
     // Reference to the CameraFollow script (assign in Inspector)
     public CameraFollow cameraFollow;
 
-    // NEW: Whether we should ignore the very first platform
+    // Whether we should ignore the very first platform
     private bool ignoreFirstLanding = true;
 
     // Instead of storing a fixed position, store a reference to the last platform's transform.
@@ -32,12 +32,19 @@ public class Move : MonoBehaviour
     // Tweak this value in the Inspector until the player lands safely on the platform.
     public float safeRespawnOffset = 1.2f;
 
+    // How much vertical distance counts as one "platform" for scoring.
+    public float scoreSpacing = 3f;
+    // The player's y position when the score was last updated.
+    private float lastScoreY;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 2.5f; // Increases falling speed
         // Start score at zero
         platformCounterText.text = "Score: 0";
+        // Initialize lastScoreY with the starting y-position of the player.
+        lastScoreY = transform.position.y;
     }
 
     void Update()
@@ -70,6 +77,22 @@ public class Move : MonoBehaviour
         // Clamp player position within screen limits
         float clampedX = Mathf.Clamp(transform.position.x, leftBoundary, rightBoundary);
         transform.position = new Vector3(clampedX, transform.position.y, transform.position.z);
+
+        // If the player has a jetpack and it's active, update the score based on vertical distance traveled.
+        JetpackPowerUp jetpack = GetComponent<JetpackPowerUp>();
+        if (jetpack != null && jetpack.IsJetpackActive())
+        {
+            float delta = transform.position.y - lastScoreY;
+            if (delta >= scoreSpacing)
+            {
+                // Calculate how many "platform units" have been passed.
+                int count = Mathf.FloorToInt(delta / scoreSpacing);
+                platformsJumped += count;
+                lastScoreY += count * scoreSpacing;
+                platformCounterText.text = "Score: " + platformsJumped;
+                Debug.Log("Jetpack scoring: increased score by " + count + " to " + platformsJumped);
+            }
+        }
 
         // Restart game if player falls below the safe threshold
         if (transform.position.y < PlatformSpawner.lowestPlatformY - 2f)

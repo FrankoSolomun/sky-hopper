@@ -8,7 +8,6 @@ public class ShieldPickup : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // e.g. shieldScript = FindObjectOfType<ShieldPowerUp>();
             if (shieldScript != null)
             {
                 shieldScript.ActivateShield();

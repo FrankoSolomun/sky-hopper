@@ -153,10 +153,13 @@ MonoBehaviour:
   powerUpPrefabs:
   - {fileID: 499629415684640028, guid: 0f61f93e1a810405bbbe8f09b80da9a6, type: 3}
   - {fileID: 2459574522242535611, guid: 4eba53d234f0146edb34172aaac696ce, type: 3}
+  - {fileID: 2866260404762301756, guid: eb693c28da3e747e29dcb404dcbc168c, type: 3}
   numberOfStartingPlatforms: 5
   verticalSpacing: 3
   minX: -2
   maxX: 2
+  specialPlatformYOffset: 1
+  specialPlatformSpawnInterval: 3
 --- !u!4 &55934961
 Transform:
   m_ObjectHideFlags: 0
@@ -187,6 +190,7 @@ GameObject:
   - component: {fileID: 65810509}
   - component: {fileID: 65810510}
   - component: {fileID: 65810511}
+  - component: {fileID: 65810512}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -361,6 +365,7 @@ MonoBehaviour:
   platformCounterText: {fileID: 537180996}
   cameraFollow: {fileID: 633868149}
   safeRespawnOffset: 1.2
+  scoreSpacing: 3
 --- !u!114 &65810510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -392,6 +397,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shieldIconPrefab: {fileID: 0}
   iconOffset: {x: 0, y: 1, z: 0}
+--- !u!114 &65810512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 65810504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 349a3c45e76a546539c8289ad3c9d652, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jetpackDuration: 10
+  upwardForce: 15
+  maxHeightGain: 20
+  jetpackIconPrefab: {fileID: 0}
+  jetpackIconOffset: {x: 5.5, y: 10, z: 10}
 --- !u!1 &147477692
 GameObject:
   m_ObjectHideFlags: 0

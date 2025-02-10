@@ -2,17 +2,15 @@ using UnityEngine;
 
 public class MagnetPickup : MonoBehaviour
 {
-    // Option A: Drag the MagnetPowerUp from your scene into this field via Inspector
+    // Reference to the MagnetPowerUp script (can be assigned in the Inspector)
     public MagnetPowerUp magnetScript;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Only pick up if the player collides
+        // Check if the player collides with the pickup
         if (other.CompareTag("Player"))
         {
-            // If you haven't assigned magnetScript in Inspector, you can do:
-            // magnetScript = FindObjectOfType<MagnetPowerUp>();
-
+            // Activate the magnet effect if the reference exists
             if (magnetScript)
             {
                 magnetScript.ActivateMagnet();
@@ -22,7 +20,7 @@ public class MagnetPickup : MonoBehaviour
                 Debug.LogWarning("[MagnetPickup] No MagnetPowerUp reference found!");
             }
 
-            // Remove this pickup object so it can't be picked again
+            // Destroy the pickup object after it's collected
             Destroy(gameObject);
         }
     }

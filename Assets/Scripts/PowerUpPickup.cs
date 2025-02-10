@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-// Define the type of power-up this pickup represents
 public enum PowerUpType { Magnet, Shield, Jetpack }
 
 public class PowerUpPickup : MonoBehaviour
@@ -24,7 +23,6 @@ public class PowerUpPickup : MonoBehaviour
         if (other.CompareTag("Player") && !isPickedUp)
         {
             isPickedUp = true;
-            Debug.Log("Power-Up collected! Type: " + powerUpType);
 
             // Attach to player
             transform.SetParent(other.transform, true);
@@ -41,11 +39,9 @@ public class PowerUpPickup : MonoBehaviour
                 if (magnetScript == null)
                 {
                     magnetScript = other.GetComponent<MagnetPowerUp>();
-                    Debug.Log("Auto-assigned magnetScript: " + (magnetScript != null));
                 }
                 if (magnetScript != null)
                 {
-                    Debug.Log("Activating magnet...");
                     magnetScript.ActivateMagnet();
                 }
                 else
@@ -58,11 +54,9 @@ public class PowerUpPickup : MonoBehaviour
                 if (shieldScript == null)
                 {
                     shieldScript = other.GetComponent<ShieldPowerUp>();
-                    Debug.Log("Auto-assigned shieldScript: " + (shieldScript != null));
                 }
                 if (shieldScript != null)
                 {
-                    Debug.Log("Activating shield...");
                     shieldScript.ActivateShield();
                 }
                 else
@@ -72,12 +66,10 @@ public class PowerUpPickup : MonoBehaviour
             }
             else if (powerUpType == PowerUpType.Jetpack)
             {
-                // For Jetpack, we auto-assign the JetpackPowerUp component from the player.
+                // For Jetpack, auto-assign the JetpackPowerUp component from the player.
                 JetpackPowerUp jetpackScript = other.GetComponent<JetpackPowerUp>();
-                Debug.Log("Auto-assigned jetpackScript: " + (jetpackScript != null));
                 if (jetpackScript != null)
                 {
-                    Debug.Log("Activating jetpack...");
                     jetpackScript.ActivateJetpack();
                 }
                 else

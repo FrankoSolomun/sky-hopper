@@ -21,7 +21,7 @@ public class ShieldPowerUp : MonoBehaviour
         if (isActive) return;
         isActive = true;
 
-        // Show shield icon above the player
+        // Show shield icon next to the player
         if (shieldIconPrefab != null)
         {
             shieldIconInstance = Instantiate(shieldIconPrefab, player.position + iconOffset, Quaternion.identity);
