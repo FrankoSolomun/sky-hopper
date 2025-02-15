@@ -57,4 +57,10 @@ public class StarManager : MonoBehaviour
             starCounterText.text = "Stars: 0";
         }
     }
+
+    // Method to get the current star count
+    public int GetStarCount()
+    {
+        return totalStars;
+    }
 }

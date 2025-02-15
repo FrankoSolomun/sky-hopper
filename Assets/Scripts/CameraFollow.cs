@@ -6,11 +6,12 @@ public class CameraFollow : MonoBehaviour
     public float smoothSpeed = 5f; // Speed factor for smooth camera movement
 
     private bool startFollowing = false; // Flag to control when the camera starts following
+    private bool isFrozen = false; // Flag to control if the camera is frozen
 
     void Update()
     {
         // Ensure the player reference exists before proceeding
-        if (player == null)
+        if (player == null || isFrozen)
         {
             return;
         }
@@ -33,5 +34,11 @@ public class CameraFollow : MonoBehaviour
         {
             startFollowing = true;
         }
+    }
+    
+    // Public method to freeze the camera at its current position
+    public void FreezeCamera()
+    {
+        isFrozen = true; // Stop the camera from following the player
     }
 }

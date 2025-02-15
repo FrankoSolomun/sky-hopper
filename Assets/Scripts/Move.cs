@@ -53,6 +53,9 @@ public class Move : MonoBehaviour
     public float spaceZoneGravityScale = 0.5f; // Gravity scale in SpaceZone
     private bool isInSpaceZone = false; // Track if the player is in SpaceZone
     public static bool isPaused = false; // Track if the game is paused
+    public GameObject gameOverUI; // Assign the Game Over Panel in the Inspector
+    private bool isDead = false;
+    
 
 
     void Start()
@@ -83,6 +86,9 @@ public class Move : MonoBehaviour
 
     void Update()
     {
+        // If the player is dead, do nothing
+        if(isDead)
+            return;
 
         // If the game is paused, do nothing
         if (isPaused)
@@ -120,8 +126,9 @@ public class Move : MonoBehaviour
             }
             else
             {
-                Debug.Log("Shield not active or no last platform saved. Restarting game.");
-                RestartGame();
+                Debug.Log("Shield not active or no last platform saved. Showing Game Over UI.");
+                FreezePlayer(true);
+                ShowGameOverUI();
             }
         }
 
@@ -155,6 +162,47 @@ public class Move : MonoBehaviour
             rb.AddForce(Vector2.up * pushForce, ForceMode2D.Force);
         }
     }
+
+    // Method to show the Game Over UI
+    // Method to show the Game Over UI
+private void ShowGameOverUI()
+{
+    if (gameOverUI != null)
+    {
+        gameOverUI.SetActive(true); // Show the Game Over UI
+
+        // Get all Text components in the Game Over UI
+        Text[] textComponents = gameOverUI.GetComponentsInChildren<Text>(true);
+
+        if (textComponents.Length >= 2) // Ensure there are at least 2 Text components
+        {
+            // Assume:
+            // textComponents[0] is the star counter
+            // textComponents[1] is the platform counter
+
+            // Update the star counter text with the current star count
+            if (StarManager.Instance != null)
+            {
+                textComponents[0].text = "Stars: " + StarManager.Instance.GetStarCount();
+            }
+            else
+            {
+                Debug.LogError("StarManager instance is missing.");
+            }
+
+            // Update the platform counter text with the current platform count
+            textComponents[1].text = "Score: " + platformsJumped;
+        }
+        else
+        {
+            Debug.LogError("Not enough Text components found in Game Over UI. Expected at least 2.");
+        }
+    }
+    else
+    {
+        Debug.LogError("Game Over UI is not assigned in the Move script.");
+    }
+}
 
     private void HandleMovement()
     {
@@ -253,8 +301,27 @@ public class Move : MonoBehaviour
         }
     }
 
+    // Method to go back to the home screen
+    public void BackToHome()
+    {
+        FreezePlayer(false); //Unfreeze the player
+        
+        // Hide the Game Over UI a show the start menu
+        if (gameOverUI != null)
+        {
+            gameOverUI.SetActive(false);
+        }
+
+        PauseManager pauseManager = FindObjectOfType<PauseManager>();
+        if (pauseManager != null && pauseManager.startMenuUI != null)
+        {
+            pauseManager.startMenuUI.SetActive(true);
+        }
+    }
+
     public void RestartGame()
     {
+        FreezePlayer(false); // Unfreeze the player
         platformsJumped = 0;
         PlatformSpawner.lowestPlatformY = 0;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -378,6 +445,16 @@ public class Move : MonoBehaviour
         {
             rb.linearVelocity = Vector2.zero; // Stop all movement
             rb.isKinematic = true; // Disable physics
+
+            // Freeze the camera
+            if (cameraFollow != null)
+            {
+                cameraFollow.FreezeCamera();
+            }
+            else
+            {
+                Debug.LogError("CameraFollow script is not assigned in the Move script.");
+            }
         }
         else
         {
