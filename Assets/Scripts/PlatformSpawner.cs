@@ -8,9 +8,17 @@ public class PlatformSpawner : MonoBehaviour
 
     // Reference to StarPrefab (assign in Inspector)
     public GameObject starPrefab;
+    public RuntimeAnimatorController starAnimatorController; // Assign your Animator Controller in the Inspector.
 
     // Reference to PowerUpPrefabs (3 prefabs: Magnet, Shield, Jetpack, etc.)
     public GameObject[] powerUpPrefabs;
+
+    // Reference to Rain Prefab (assign in Inspector)
+    public GameObject rainPrefab;
+
+    // Reference to ElecCloud and Lightning Prefabs (assign in Inspector)
+    public GameObject elecCloudPrefab; // Add this line
+    public GameObject lightningPrefab; // Add this line
 
     public int numberOfStartingPlatforms = 5;
     public float verticalSpacing = 3f;
@@ -18,6 +26,9 @@ public class PlatformSpawner : MonoBehaviour
 
     // This determines how far above the regular platform the special prefab should be placed.
     public float specialPlatformYOffset = 1f;
+
+    // This determines the range for the X-axis offset of the special platform.
+    public float specialPlatformXOffsetRange = 1f;
 
     private float highestPlatformY;
     public static float lowestPlatformY;
@@ -50,6 +61,7 @@ public class PlatformSpawner : MonoBehaviour
 
         if (!zoneManager)
         {
+            Debug.LogError("ZoneManager is not assigned!");
             return;
         }
 
@@ -86,12 +98,13 @@ public class PlatformSpawner : MonoBehaviour
     {
         // Determine current zone and pick a platform prefab
         ZoneDefinition currentZone = zoneManager.GetCurrentZone();
-        if (currentZone == null ||
-            currentZone.zonePlatformPrefabs == null ||
-            currentZone.zonePlatformPrefabs.Length == 0)
+        if (currentZone == null)
         {
+            Debug.LogError("Current zone is null!");
             return;
         }
+
+        Debug.Log("Current Zone: " + currentZone.zoneName); // Debug the zone name
 
         float xPos = Random.Range(minX, maxX);
         float yPos = highestPlatformY + verticalSpacing;
@@ -154,10 +167,25 @@ public class PlatformSpawner : MonoBehaviour
                     Vector3 startPosition = newPlatform.transform.position; // Capture the initial position
 
                     // Calculate the special platform position using the start position
-                    Vector3 specialPlatformPos = startPosition + new Vector3(0f, specialPlatformYOffset, 0f);
+                    float specialPlatformXOffset = Random.Range(-specialPlatformXOffsetRange, specialPlatformXOffsetRange);
+                    Vector3 specialPlatformPos = startPosition + new Vector3(specialPlatformXOffset, specialPlatformYOffset, 0f);
 
                     // Instantiate the special platform at the modified start position
                     GameObject specialPlatform = Instantiate(specialPrefab, specialPlatformPos, Quaternion.identity);
+
+                    // Apply custom offset for specific prefabs
+                    if (specialPrefab.name == "antena")
+                    {
+                         // Add a trigger collider to the special platform
+                        BoxCollider2D triggerCollider = specialPlatform.AddComponent<BoxCollider2D>();
+                        triggerCollider.isTrigger = true;
+                    
+                        // Add the SpecialPlatformEffect script to the special platform
+                        SpecialPlatformEffect specialEffect = specialPlatform.AddComponent<SpecialPlatformEffect>();
+                        specialEffect.pushForce = 5f; // Adjust as needed
+                        specialEffect.movementResistance = 2f; // Adjust as needed
+                        specialPlatform.transform.position += new Vector3(1.1f, 1.1f, 0f); // Custom offset for this prefab
+                    }
 
                     // Attach the special platform as a child of the regular platform so it moves with it.
                     specialPlatform.transform.SetParent(newPlatform.transform, true);
@@ -173,6 +201,30 @@ public class PlatformSpawner : MonoBehaviour
         {
             platformCounterSinceLastSpecial++;
         }
+
+        // RAIN, ELECCLOUD, AND LIGHTNING LOGIC: Attach to specific platforms in zone2
+        if (currentZone.zoneName == "StormZone")
+        {
+            // Check if the platform has a specific name
+            if (newPlatform.name.Contains("02cloud 64 1"))
+            {
+                AttachRainToCloud(newPlatform);
+
+                // Add a random chance to attach elecCloud (e.g., 50% chance)
+                float elecCloudChance = 0.5f; // 50% chance of elecCloud
+                if (Random.value < elecCloudChance)
+                {
+                    AttachElecCloud(newPlatform);
+                }
+
+                // Add a random chance to attach lightning (e.g., 50% chance)
+                float lightningChance = 0.5f; // 50% chance of lightning
+                if (Random.value < lightningChance)
+                {
+                    AttachLightning(newPlatform);
+                }
+            }
+        }
     }
 
     // STAR: Positions a star in the center (X) of the platform,
@@ -185,6 +237,19 @@ public class PlatformSpawner : MonoBehaviour
         GameObject star = Instantiate(starPrefab, starPosition, Quaternion.identity);
         // Make the star a child of the platform so it moves if the platform moves.
         star.transform.SetParent(platform.transform, true);
+
+         // Add an Animator component to the star if it doesn't already have one.
+        Animator starAnimator = star.GetComponent<Animator>();
+        if (!starAnimator)
+        {
+            starAnimator = star.AddComponent<Animator>();
+        }
+
+        // Assign the Animator Controller.
+        starAnimator.runtimeAnimatorController = starAnimatorController;
+
+        // If you want to play the animation immediately:
+        starAnimator.Play("StarAnimation");
     }
 
     // POWER-UP: Picks a random power-up from your array (Magnet, Shield, Jetpack, etc.)
@@ -202,6 +267,63 @@ public class PlatformSpawner : MonoBehaviour
         GameObject newPowerUp = Instantiate(powerUpPrefab, powerUpPos, Quaternion.identity);
         // Parent it so that if the platform moves, the power-up follows.
         newPowerUp.transform.SetParent(platform.transform, true);
+    }
+
+    // RAIN: Attaches rain prefab to clouds in zone2
+    void AttachRainToCloud(GameObject cloud)
+    {
+        if (!rainPrefab)
+        {
+            Debug.LogError("Rain Prefab is not assigned!");
+            return;
+        }
+
+        Debug.Log("Attaching rain to platform: " + cloud.name);
+
+        // Position the rain slightly below the cloud
+        Vector3 rainPosition = cloud.transform.position + new Vector3(0f, -1f, 0f);
+        GameObject rain = Instantiate(rainPrefab, rainPosition, Quaternion.identity);
+
+        // Make the rain a child of the cloud so it moves with it
+        rain.transform.SetParent(cloud.transform, true);
+    }
+
+    // ELECCLOUD: Attaches elecCloud prefab to clouds in zone2
+    void AttachElecCloud(GameObject cloud)
+    {
+        if (!elecCloudPrefab)
+        {
+            Debug.LogError("ElecCloud Prefab is not assigned!");
+            return;
+        }
+
+        Debug.Log("Attaching elecCloud to platform: " + cloud.name);
+
+        // Position the elecCloud slightly above the cloud
+        Vector3 elecCloudPosition = cloud.transform.position + new Vector3(0f, 0f, 0f);
+        GameObject elecCloud = Instantiate(elecCloudPrefab, elecCloudPosition, Quaternion.identity);
+
+        // Make the elecCloud a child of the cloud so it moves with it
+        elecCloud.transform.SetParent(cloud.transform, true);
+    }
+
+    // LIGHTNING: Attaches lightning prefab to clouds in zone2
+    void AttachLightning(GameObject cloud)
+    {
+        if (!lightningPrefab)
+        {
+            Debug.LogError("Lightning Prefab is not assigned!");
+            return;
+        }
+
+        Debug.Log("Attaching lightning to platform: " + cloud.name);
+
+        // Position the lightning slightly below the cloud
+        Vector3 lightningPosition = cloud.transform.position + new Vector3(0f, -1f, 0f);
+        GameObject lightning = Instantiate(lightningPrefab, lightningPosition, Quaternion.identity);
+
+        // Make the lightning a child of the cloud so it moves with it
+        lightning.transform.SetParent(cloud.transform, true);
     }
 
     void RemoveOldPlatforms()

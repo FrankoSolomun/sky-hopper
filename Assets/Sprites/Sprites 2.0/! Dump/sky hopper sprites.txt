@@ -1,0 +1,64 @@
+• Theme: Transition from the calm blue sky to turbulent storm clouds, and finally to
+space-themed stations. Space introduces visually distinct platforms like mini stations
+with rocket engines but keeps the gravity mechanics consistent.
+
+
+KARAKTER
+- karakter
+- animacija hodanje karaktera
+- animacija skakanje karaktera
+
+PLATFORME
+- Regular Cloud/Station: Basic platform that vanishes after one jump.
+- Storm Cloud: Electrified and requires immediate jumping; failure to jump results in
+the game ending.
+- Stationary Platform: Remains in place but disappears after two jumps.
+- Space Station Platform: Appears in space zones, visually themed as smaller stations
+with glowing lights or antennas. Moving platforms here have fire/rocket effects on
+their sides.
+- pulsirajuca crvena platforma (space section hazards)
+
+POWERUPOVI
+- Bird Rescue: After 20 successful jumps, the player unlocks a bird companion. The
+bird saves them from one fall and drops them back on the nearest platform.
+- Jetpack: Propels the player upward for 5 seconds, allowing them to bypass difficult
+sections.
+- Shield: Protects against one hazard, such as a storm cloud or lightning strike
+
+NEBO
+- klasicno plavo
+- turbulentno, sivo, kisa, oluja, i slicno
+- animacija prijelaz plavo na sivo
+- kisa za sivu pozadinu (loop)
+-  Lightning Bolts: animacija munje (koja ce biti kao dio igre, koju se treba zaobici)
+- svemirsko nebo - zvjezdice (tockice - loop), space shutlovi, planete
+- animacija prijelaz tamno zivo ruzno vrijeme na svemirsko nebo
+
+Add Collectibles (Stars/Coins)
+Add particle effects (e.g., rain in storm levels, spark trails on moving platforms).
+
+HOW TO PLAY WINDOW
+
+
+
+
+
+UKRATKO
+Visual Assets:
+• Player sprite (character or bouncing ball).
+• Platform sprites (regular, storm, moving, space).
+• Backgrounds for sky, storm, and space.
+• Collectibles (stars/coins).
+• Power-up icons (bird, jetpack, shield).
+• Hazard effects (lightning, falling debris).
+
+Particle Effects:
+• Jump trail.
+• Vanishing platforms.
+• Rain and lightning effects.
+• Rocket fire for space platforms.
+
+UI Assets:
+• Fonts and buttons for menus.
+• Scoreboard panel.
+• Icons for power-ups and player progress.

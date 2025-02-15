@@ -26,7 +26,7 @@ public class PowerUpPickup : MonoBehaviour
 
             // Attach to player
             transform.SetParent(other.transform, true);
-            transform.localScale = Vector3.one * 2f;
+            transform.localScale = Vector3.one * 0.5f;
             transform.localPosition = playerHeadOffset;
 
             // Disable collider

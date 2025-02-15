@@ -19,13 +19,10 @@ MonoBehaviour:
   - {fileID: 2183363577991331177, guid: c3d8ccd937aa043c69a47c4912b7e0f5, type: 3}
   zonePlatformPrefabs:
   - {fileID: 3477750324015517409, guid: bf4c31d9b550847d8b46206e5fd45956, type: 3}
-  - {fileID: 7147052478377130057, guid: 1be549b5ed4f648ab9c075f85d7fa2f1, type: 3}
   - {fileID: 6263913491153470687, guid: f2341b98228d8483ba527b3626c14dcf, type: 3}
   - {fileID: 6290828929241130494, guid: 92065185b44b14e76b5e15d565efb6d9, type: 3}
-  - {fileID: 665026013918360287, guid: bf25e2f23cfb549e8b8394b47c1885c9, type: 3}
   - {fileID: 1957460691531786797, guid: 9dfa49c76ac30437b986b52d01d32c07, type: 3}
   zoneSpecialPlatformPrefabs:
   - {fileID: 1551958260452904602, guid: 7fda09f7f6ab84c5b8df1b2464cfc7ea, type: 3}
-  - {fileID: 701174729376888273, guid: fcf32cbd14c4d4c489ecd09372bb7d88, type: 3}
   startScore: 0
   endScore: 20

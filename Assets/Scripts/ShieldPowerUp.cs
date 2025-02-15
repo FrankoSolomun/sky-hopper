@@ -5,30 +5,36 @@ public class ShieldPowerUp : MonoBehaviour
 {
     private bool isActive = false;
     private Transform player;
-    private GameObject shieldIconInstance;
 
-    [Header("Shield Settings")]
-    public GameObject shieldIconPrefab;
-    public Vector3 iconOffset = new Vector3(0, 1, 0);
+    [Header("Shield Animation")]
+    public GameObject shieldObject; // Assign the shield GameObject in the inspector
+    public float shieldDuration = 10f; // Duration of the shield
 
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
+
+        // Ensure the shield is initially disabled
+        if (shieldObject != null)
+        {
+            shieldObject.SetActive(false);
+        }
     }
 
     public void ActivateShield()
     {
-        if (isActive) return;
+        if (isActive) return; // Do nothing if the shield is already active
         isActive = true;
 
-        // Show shield icon next to the player
-        if (shieldIconPrefab != null)
+        // Enable the shield GameObject
+        if (shieldObject != null)
         {
-            shieldIconInstance = Instantiate(shieldIconPrefab, player.position + iconOffset, Quaternion.identity);
-            shieldIconInstance.transform.SetParent(player, true);
+            shieldObject.SetActive(true);
+            Debug.Log("Shield Activated");
         }
 
-        StartCoroutine(DisableAfterTime(10f));
+        // Start the timer to disable the shield
+        StartCoroutine(DisableAfterTime(shieldDuration));
     }
 
     public bool IsShieldActive()
@@ -38,12 +44,14 @@ public class ShieldPowerUp : MonoBehaviour
 
     public void DisableShield()
     {
+        if (!isActive) return; // Do nothing if the shield is not active
         isActive = false;
 
-        // Remove the shield icon
-        if (shieldIconInstance != null)
+        // Disable the shield GameObject
+        if (shieldObject != null)
         {
-            Destroy(shieldIconInstance);
+            shieldObject.SetActive(false);
+            Debug.Log("Shield Deactivated");
         }
     }
 

@@ -1,12 +1,15 @@
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI; // Add this namespace for UnityEngine.UI.Text
 
 public class StarManager : MonoBehaviour
 {
     public static StarManager Instance;  // Singleton reference
 
-    // Assign this in the Inspector to your TextMeshProUGUI field
-    public TextMeshProUGUI starCounterText;
+    // Assign this in the Inspector to your Text field
+    public Text starCounterText;
+
+    // Add a public field for the new font
+    public Font newFont;
 
     private int totalStars = 0;
 
@@ -19,7 +22,6 @@ public class StarManager : MonoBehaviour
             return;
         }
         Instance = this;
-
     }
 
     void Start()
@@ -28,6 +30,12 @@ public class StarManager : MonoBehaviour
         if (starCounterText)
         {
             starCounterText.text = "Stars: 0";
+
+            // Change the font if a new font is assigned
+            if (newFont != null)
+            {
+                starCounterText.font = newFont;
+            }
         }
     }
 

@@ -1,0 +1,51 @@
+1. Kreiranje novog Unity projekta
+Otvori Unity Hub i stvori novi 2D projekt.
+Nazovi ga prema svom projektu i postavi lokaciju.
+2. Postavljanje piksela i rezolucije
+Pixel art igre zahtijevaju preciznu kontrolu nad rezolucijom i skaliranjem.
+
+Project Settings
+Idi na Edit > Project Settings > Player
+
+Resolution and Presentation
+Fullscreen Mode: Windowed
+Default Screen Width/Height: Postavi na razmjere u skladu s tvojim pixel art stilom (npr. 640x360 ili 1280x720).
+Camera Settings
+Odaberi Main Camera i u Inspector panelu postavi:
+Projection: Orthographic
+Size: Ovisi o veličini piksela, ali možeš testirati vrijednosti poput 240 / Pixels Per Unit.
+Filtering: Postavi None da spriječiš zamućenje piksela.
+3. Postavljanje sprite-ova za pixel art
+Otvorit ćeš Import Settings za svaki sprite kako bi izbjegao probleme s mutnim prikazom.
+
+Klikni na sprite u Project panelu.
+U Inspector panelu:
+Texture Type: Sprite (2D and UI)
+Pixels Per Unit (PPU): Ovisno o dizajnu (npr. ako sprite ima 16x16 piksela, koristi PPU 16).
+Filter Mode: Point (No Filter) – sprječava zamućenje.
+Compression: None – čuva originalne boje.
+Klikni Apply.
+4. Postavljanje grida za tilemap
+Ako koristiš tilemap za okruženje:
+
+Idi na GameObject > 2D Object > Tilemap > Rectangular.
+Podesi Grid veličinu prema veličini sprite-ova.
+5. Pixel Perfect kamera (sprječava artefakte kod pomicanja kamere)
+Dodaj Pixel Perfect Camera komponentu na Main Camera:
+Assets > Package Manager > 2D Pixel Perfect
+Dodaj komponentu i aktiviraj Pixel Snapping.
+6. Postavljanje physics-a (ako koristiš 2D fiziku)
+Idi na Edit > Project Settings > Physics 2D i postavi:
+
+Default Contact Offset: 0.0001
+Velocity Iterations: 8
+Position Iterations: 3
+7. UI postavke za pixel art
+Ako koristiš UI elemente (tekst, dugmad), osiguraj da su skalirani u skladu s pixel art stilom:
+
+Canvas: Postavi Canvas Scaler na Scale With Screen Size i koristi Reference Resolution odgovarajuću za tvoju igru.
+Fontovi: Koristi bitmap fontove kako bi zadržao oštar izgled teksta.
+8. Testiranje i podešavanje
+Pokreni igru u različitim rezolucijama da vidiš je li pixel art konzistentan.
+Ako primijetiš zamućenje, provjeri Filter Mode i PPU.
+Eksperimentiraj s različitim veličinama Orthographic Size na kameri.

@@ -1,16 +1,22 @@
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using System.Collections;
 
 public class Move : MonoBehaviour
 {
+    public ZoneManager zoneManager;
     public float moveSpeed = 7f;
     public float jumpForce = 12f;
+    public float spaceZoneJumpForceMultiplier = 2f; // Increase jump force in SpaceZone
 
-    public TextMeshProUGUI platformCounterText;
+    public Text platformCounterText;
+    public Font newFont; // Add a public field for the new font
     private Rigidbody2D rb;
+    private Animator animator;
     public static bool isGrounded = false;
+    public AudioSource jumpSoundEffect;
 
     // The total count of unique platforms landed on (or passed)
     public static int platformsJumped = 0;
@@ -37,21 +43,53 @@ public class Move : MonoBehaviour
     // The player's y position when the score was last updated.
     private float lastScoreY;
 
+    // Variables for special platform effect
+    private bool isNearSpecialPlatform = false;
+    private float movementResistance = 1f; // Default resistance (no effect)
+    private float pushForce = 0f; // Default push force (no effect)
+    private Coroutine resetEffectsCoroutine; // Coroutine to delay resetting effects
+
+    public float normalGravityScale = 2.5f; // Normal gravity scale
+    public float spaceZoneGravityScale = 0.5f; // Gravity scale in SpaceZone
+    private bool isInSpaceZone = false; // Track if the player is in SpaceZone
+    public static bool isPaused = false; // Track if the game is paused
+
+
     void Start()
     {
+        // Reset the pause state
+        PauseManager pauseManager = FindObjectOfType<PauseManager>();
+        if (pauseManager != null)
+        {
+            pauseManager.ResumeGame(); // Ensure the game is not paused
+        }
+        
+        animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
-        rb.gravityScale = 2.5f; // Increases falling speed
+        rb.gravityScale = normalGravityScale; // Increases falling speed
+
         // Start score at zero
         platformCounterText.text = "Score: 0";
+
+        // Change the font if a new font is assigned
+        if (newFont != null)
+        {
+            platformCounterText.font = newFont;
+        }
+        
         // Initialize lastScoreY with the starting y-position of the player.
         lastScoreY = transform.position.y;
     }
 
     void Update()
     {
-        // Get movement input
-        Vector3 movement = new Vector3(Input.GetAxis("Horizontal"), 0f, 0f);
-        transform.position += movement * Time.deltaTime * moveSpeed;
+
+        // If the game is paused, do nothing
+        if (isPaused)
+            return;
+
+        // Update animations based on input and state
+        HandleAnimations();
 
         // Allow jumping continuously while holding Space if the player is grounded
         if (Input.GetButton("Jump") && isGrounded)
@@ -59,54 +97,11 @@ public class Move : MonoBehaviour
             Jump();
         }
 
-        // Faster falling effect
-        if (rb.linearVelocity.y < 0)
-        {
-            rb.gravityScale = 4f; // Increase gravity for falling
-        }
-        else
-        {
-            rb.gravityScale = 2f; // Normal gravity while rising
-        }
-
-        // Get camera width boundaries
-        float cameraHalfWidth = Camera.main.orthographicSize * Screen.width / Screen.height;
-        float leftBoundary = -cameraHalfWidth;
-        float rightBoundary = cameraHalfWidth;
-
-        // Clamp player position within screen limits
-        float clampedX = Mathf.Clamp(transform.position.x, leftBoundary, rightBoundary);
-        transform.position = new Vector3(clampedX, transform.position.y, transform.position.z);
-
-        // If the player has a jetpack and it's active, update the score based on vertical distance traveled.
-        JetpackPowerUp jetpack = GetComponent<JetpackPowerUp>();
-        if (jetpack != null && jetpack.IsJetpackActive())
-        {
-            float delta = transform.position.y - lastScoreY;
-            if (delta >= scoreSpacing)
-            {
-                // Calculate how many "platform units" have been passed.
-                int count = Mathf.FloorToInt(delta / scoreSpacing);
-                platformsJumped += count;
-                lastScoreY += count * scoreSpacing;
-                platformCounterText.text = "Score: " + platformsJumped;
-                Debug.Log("Jetpack scoring: increased score by " + count + " to " + platformsJumped);
-            }
-        }
-
         // Restart game if player falls below the safe threshold
         if (transform.position.y < PlatformSpawner.lowestPlatformY - 2f)
         {
             Debug.Log("Player is falling below safe threshold. Checking for shield...");
             ShieldPowerUp shield = FindObjectOfType<ShieldPowerUp>();
-            if (shield != null)
-            {
-                Debug.Log("Found ShieldPowerUp. IsShieldActive: " + shield.IsShieldActive() + ", hasLastPlatform: " + hasLastPlatform);
-            }
-            else
-            {
-                Debug.Log("No ShieldPowerUp found on the scene.");
-            }
             if (shield && shield.IsShieldActive() && hasLastPlatform)
             {
                 Debug.Log("Shield is active. Teleporting player to current position of last platform: " + lastPlatform.position);
@@ -129,12 +124,127 @@ public class Move : MonoBehaviour
                 RestartGame();
             }
         }
+
+        // Check the current zone and handle SpaceZone logic
+        ZoneDefinition currentZone = zoneManager.GetCurrentZone();
+        if (currentZone != null)
+        {
+            if (currentZone.zoneName == "SpaceZone" && !isInSpaceZone)
+            {
+                EnterSpaceZone(); // Enter SpaceZone
+            }
+                else if (currentZone.zoneName != "SpaceZone" && isInSpaceZone)
+            {
+                ExitSpaceZone(); // Exit SpaceZone
+            }
+        }
+    }
+
+    void FixedUpdate()
+    {
+        // If the game is paused, do nothing
+        if (isPaused)
+            return;
+
+        // Handle movement in FixedUpdate for smoother physics
+        HandleMovement();
+
+        // Apply push force if near a special platform
+        if (isNearSpecialPlatform)
+        {
+            rb.AddForce(Vector2.up * pushForce, ForceMode2D.Force);
+        }
+    }
+
+    private void HandleMovement()
+    {
+        // Get raw input for immediate response
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+        Vector2 velocity = rb.linearVelocity;
+        velocity.x = horizontalInput * moveSpeed / movementResistance; // Apply movement resistance
+        rb.linearVelocity = velocity;
+
+        // Flip the player horizontally based on movement direction
+        if (horizontalInput > 0.1f) // Moving right
+        {
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z); // Face right
+        }
+        else if (horizontalInput < -0.1f) // Moving left
+        {
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z); // Face left
+        }
+
+        // Faster falling effect
+        if (rb.linearVelocity.y < 0)
+        {
+            rb.gravityScale = 4f; // Increase gravity for falling
+        }
+        else
+        {
+            rb.gravityScale = 2f; // Normal gravity while rising
+        }
+
+        // Get camera width boundaries
+        float cameraHalfWidth = Camera.main.orthographicSize * Screen.width / Screen.height;
+        float leftBoundary = -cameraHalfWidth;
+        float rightBoundary = cameraHalfWidth;
+
+        // Clamp player position within screen limits
+        float clampedX = Mathf.Clamp(transform.position.x, leftBoundary, rightBoundary);
+        transform.position = new Vector3(clampedX, transform.position.y, transform.position.z);
+    }
+
+    private void HandleAnimations()
+    {
+
+        // If the game is paused, stop animations
+        if (isPaused)
+        {
+            animator.speed = 0; // Pause animations
+            return;
+        }
+        else
+        {
+            animator.speed = 1; // Resume animations
+        }
+        // Update animation parameters
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+
+        // Set the xVelocity parameter based on horizontal movement
+        animator.SetFloat("xVelocity", Mathf.Abs(horizontalInput));
+
+        // Set the yVelocity parameter based on vertical movement
+        animator.SetFloat("yVelocity", rb.linearVelocity.y);
+
+        // Set the isJumping parameter based on whether the player is grounded
+        animator.SetBool("isJumping", !isGrounded);
+
+        // Set the isRunning parameter based on horizontal movement
+        // Allow running animation to play even when jumping
+        animator.SetBool("isRunning", Mathf.Abs(horizontalInput) > 0.1f && isGrounded);
+
+        // Add a new parameter to blend running and jumping animations
+        animator.SetBool("isRunningWhileJumping", Mathf.Abs(horizontalInput) > 0.1f && !isGrounded);
     }
 
     private void Jump()
     {
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        float effectiveJumpForce = jumpForce;
+
+        // Increase jump force in SpaceZone
+        if (isInSpaceZone)
+        {
+            effectiveJumpForce *= spaceZoneJumpForceMultiplier;
+        }
+
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, effectiveJumpForce);
         isGrounded = false;
+        
+        if(jumpSoundEffect != null)
+        {
+            jumpSoundEffect.Play();
+        }
+        animator.SetBool("isJumping", true);
 
         // If we jump, un-parent from any moving platform
         if (transform.parent != null)
@@ -143,7 +253,7 @@ public class Move : MonoBehaviour
         }
     }
 
-    private void RestartGame()
+    public void RestartGame()
     {
         platformsJumped = 0;
         PlatformSpawner.lowestPlatformY = 0;
@@ -164,6 +274,7 @@ public class Move : MonoBehaviour
                     Debug.Log("Landed on platform (reference saved): " + lastPlatform.name + " at position: " + lastPlatform.position);
 
                     isGrounded = true;
+                    animator.SetBool("isJumping", false);
 
                     // If the platform is a MovingPlatform, parent the player
                     MovingPlatform movingPlat = collision.gameObject.GetComponent<MovingPlatform>();
@@ -205,10 +316,85 @@ public class Move : MonoBehaviour
         if (collision.gameObject.CompareTag("Platform") || collision.gameObject.CompareTag("SpecialPlatform"))
         {
             isGrounded = false;
+            animator.SetBool("isJumping", true);
             if (transform.parent == collision.transform)
             {
                 transform.parent = null;
             }
         }
     }
+
+    // Called when the player enters the vicinity of a special platform
+    public void EnterSpecialPlatformVicinity(float resistance, float force)
+    {
+        isNearSpecialPlatform = true;
+        movementResistance = resistance;
+        pushForce = force;
+
+        // Stop any existing reset coroutine
+        if (resetEffectsCoroutine != null)
+        {
+            StopCoroutine(resetEffectsCoroutine);
+        }
+    }
+
+    // Called when the player exits the vicinity of a special platform
+    public void ExitSpecialPlatformVicinity()
+    {
+        // Start a coroutine to reset effects after 2 seconds
+        resetEffectsCoroutine = StartCoroutine(ResetEffectsAfterDelay(2f));
+    }
+
+    // Coroutine to reset effects after a delay
+    private IEnumerator ResetEffectsAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // Reset effects
+        isNearSpecialPlatform = false;
+        movementResistance = 1f; // Reset to default
+        pushForce = 0f; // Reset to default
+    }
+
+    // Called when entering SpaceZone
+    public void EnterSpaceZone()
+    {
+        isInSpaceZone = true;
+        rb.gravityScale = spaceZoneGravityScale;
+        Debug.Log("Entered SpaceZone. Gravity scale changed to: " + spaceZoneGravityScale);
+    }
+
+    // Called when exiting SpaceZone
+    public void ExitSpaceZone()
+    {
+        isInSpaceZone = false;
+        rb.gravityScale = normalGravityScale;
+        Debug.Log("Exited SpaceZone. Gravity scale restored to: " + normalGravityScale);
+    }
+
+    public void FreezePlayer(bool freeze)
+    {
+        if (freeze)
+        {
+            rb.linearVelocity = Vector2.zero; // Stop all movement
+            rb.isKinematic = true; // Disable physics
+        }
+        else
+        {
+            rb.isKinematic = false; // Re-enable physics
+        }
+    }
+     // Add these methods to handle pause/resume
+    public static void PauseGame()
+    {
+        isPaused = true;
+        Time.timeScale = 0; // Freeze the game
+    }
+
+    public static void ResumeGame()
+    {
+        isPaused = false;
+        Time.timeScale = 1; // Resume the game
+    }
+
 }

@@ -17,6 +17,10 @@ public class JetpackPowerUp : MonoBehaviour
     public Vector3 jetpackIconOffset = new Vector3(0f, -0.5f, 0f); // Offset for proper icon positioning
     private GameObject jetpackIconInstance; // Instance of the jetpack icon
 
+    [Header("Animation")]
+    public Animator playerAnimator;        // Reference to the player's Animator component
+    private string jetpackAnimationBool = "IsJetpackActive"; // Name of the animation parameter
+    
     void Start()
     {
         // Find the player using the "Player" tag
@@ -26,6 +30,16 @@ public class JetpackPowerUp : MonoBehaviour
         if (player == null)
         {
             Debug.LogError("JetpackPowerUp: Player not found!");
+        }
+
+         // Get the player's Animator component
+        if (playerAnimator == null)
+        {
+            playerAnimator = player.GetComponent<Animator>();
+        }
+        if (playerAnimator != null)
+        {
+            playerAnimator.enabled = true; // Ensure the Animator is enabled
         }
     }
 
@@ -56,6 +70,12 @@ public class JetpackPowerUp : MonoBehaviour
             jetpackIconInstance.transform.localPosition = jetpackIconOffset;
         }
 
+         // Trigger the jetpack animation
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool(jetpackAnimationBool, true);
+            playerAnimator.SetLayerWeight(1, 1); // Enable JetpackLayer
+        }
         // Start the coroutine to handle jetpack duration and movement
         StartCoroutine(JetpackRoutine());
     }
@@ -103,6 +123,13 @@ public class JetpackPowerUp : MonoBehaviour
         {
             Destroy(jetpackIconInstance);
         }
+
+        // Stop the jetpack animation
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool(jetpackAnimationBool, false);
+            playerAnimator.SetLayerWeight(1, 0); // Disable JetpackLayer
+        }   
     }
 
     // Checks if the jetpack is currently active.
