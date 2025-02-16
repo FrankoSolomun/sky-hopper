@@ -240,6 +240,22 @@ private void ShowGameOverUI()
         // Clamp player position within screen limits
         float clampedX = Mathf.Clamp(transform.position.x, leftBoundary, rightBoundary);
         transform.position = new Vector3(clampedX, transform.position.y, transform.position.z);
+
+        // If the player has jetpack and its active, update the score based on vertical distance traveled
+        JetpackPowerUp jetpack = GetComponent<JetpackPowerUp>();
+        if (jetpack != null & jetpack.IsJetpackActive())
+        {
+            float delta = transform.position.y - lastScoreY;
+            if (delta >= scoreSpacing)
+            {
+                // Calculate how many "platform units" have been paused
+                int count = Mathf.FloorToInt(delta / scoreSpacing);
+                platformsJumped += count;
+                lastScoreY += count * scoreSpacing;
+                platformCounterText.text = "Score" + platformsJumped;
+                Debug.Log("Jetpack scring: increased score by " + count + "to" + platformsJumped);
+            }
+        }
     }
 
     private void HandleAnimations()
